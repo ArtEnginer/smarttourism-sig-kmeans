@@ -3,64 +3,62 @@ require_once '../includes/header.php';
 require_once '../includes/kmeans.php';
 
 $k = isset($_GET['k']) ? max(2, min(5, (int)$_GET['k'])) : 3;
-$showIter = isset($_GET['iter']) ? (int)$_GET['iter'] : 1;
 $km = runKMeans($k);
+$showIter = isset($_GET['iter']) ? (int)$_GET['iter'] : 1;
 $totalIter = $km['iterations'];
 $showIter = max(1, min($showIter, $totalIter));
 $iterData = $km['history'][$showIter - 1];
-$fieldsLabel = $km['fields_label'];
 $fields = $km['fields'];
+$fieldsLabel = $km['fields_label'];
 ?>
 <div class="page-content">
 
-<!-- Iteration Navigator -->
+<!-- Navigator -->
 <div class="card mb-24">
   <div class="card-header">
-    <div class="card-title">🔄 Detail Iterasi K-Means (K=<?= $k ?>)</div>
+    <div class="card-title"><i data-lucide="refresh-cw" style="width:15px;height:15px;color:var(--blue);"></i> Detail Iterasi K-Means (K=<?= $k ?>)</div>
     <a href="clustering.php?k=<?= $k ?>" class="btn btn-secondary btn-sm">← Kembali</a>
   </div>
   <div class="card-body">
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
       <?php if ($showIter > 1): ?>
       <a href="?k=<?= $k ?>&iter=<?= $showIter-1 ?>" class="btn btn-secondary btn-sm">← Sebelumnya</a>
       <?php endif; ?>
-      
-      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <?php for ($it=1; $it<=$totalIter; $it++): ?>
-        <a href="?k=<?= $k ?>&iter=<?= $it ?>" class="btn <?= $it===$showIter ? 'btn-primary' : 'btn-secondary' ?> btn-sm">
-          Iterasi <?= $it ?><?= $it===$totalIter ? ' ✓' : '' ?>
+        <a href="?k=<?= $k ?>&iter=<?= $it ?>" class="btn <?= $it===$showIter?'btn-primary':'btn-secondary' ?> btn-sm">
+          Iterasi <?= $it ?><?= $it===$totalIter?' ✓':'' ?>
         </a>
         <?php endfor; ?>
       </div>
-
       <?php if ($showIter < $totalIter): ?>
       <a href="?k=<?= $k ?>&iter=<?= $showIter+1 ?>" class="btn btn-secondary btn-sm">Berikutnya →</a>
       <?php endif; ?>
     </div>
-    <div style="background: <?= $showIter===$totalIter ? '#f0fdf4' : '#eff6ff' ?>; border: 1px solid <?= $showIter===$totalIter ? '#bbf7d0' : '#bfdbfe' ?>; border-radius: 10px; padding: 12px 16px; font-size: 13px;">
+    <div class="info-box <?= $showIter===$totalIter?'green':'blue' ?>">
       <?php if ($showIter === $totalIter): ?>
-      ✅ <strong>Iterasi <?= $showIter ?> (Terakhir)</strong> — Algoritma konvergen! Centroid tidak berubah dari iterasi sebelumnya.
+      ✅ <strong>Iterasi <?= $showIter ?> (Terakhir)</strong> — Centroid tidak berubah dari iterasi sebelumnya → <strong>KONVERGEN</strong>
       <?php else: ?>
-      🔄 <strong>Iterasi <?= $showIter ?> dari <?= $totalIter ?></strong> — Sedang memperbarui penugasan dan centroid...
+      🔄 <strong>Iterasi <?= $showIter ?> dari <?= $totalIter ?></strong> — Memperbarui penugasan dan menghitung centroid baru...
       <?php endif; ?>
     </div>
   </div>
 </div>
 
-<!-- Centroids at this iteration -->
+<!-- Centroid posisi iterasi ini -->
 <div class="card mb-24">
   <div class="card-header">
-    <div class="card-title">📌 Posisi Centroid — Iterasi <?= $showIter ?></div>
+    <div class="card-title"><i data-lucide="crosshair" style="width:15px;height:15px;color:var(--purple);"></i> Posisi Centroid — Iterasi <?= $showIter ?></div>
   </div>
   <div class="card-body">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;">
       <?php foreach ($iterData['centroids'] as $ci => $c): ?>
-      <div style="background: white; border: 2px solid <?= $km['colors'][$ci] ?? '#64748b' ?>20; border-left: 4px solid <?= $km['colors'][$ci] ?? '#64748b' ?>; border-radius: 12px; padding: 14px;">
-        <div style="font-size: 11px; font-weight: 700; color: <?= $km['colors'][$ci] ?>; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Centroid C<?= $ci+1 ?></div>
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-left:4px solid <?= $km['colors'][$ci] ?>;border-radius:12px;padding:12px;">
+        <div style="font-size:10px;font-weight:800;color:<?= $km['colors'][$ci] ?>;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Centroid C<?= $ci+1 ?></div>
         <?php foreach ($fields as $f): ?>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0;">
-          <span style="color:var(--text-muted);"><?= $fieldsLabel[$f] ?></span>
-          <span style="font-family: monospace; font-weight: 600; color: var(--slate);"><?= round($c[$f], 4) ?></span>
+        <div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;">
+          <span style="color:var(--text-3);"><?= $fieldsLabel[$f] ?></span>
+          <span class="mono" style="font-weight:600;color:var(--text);"><?= round($c[$f], 6) ?></span>
         </div>
         <?php endforeach; ?>
       </div>
@@ -69,52 +67,43 @@ $fields = $km['fields'];
   </div>
 </div>
 
-<!-- Distance Matrix & Assignment -->
+<!-- Matriks Jarak -->
 <div class="card mb-24">
   <div class="card-header">
-    <div class="card-title">📏 Matriks Jarak & Penugasan Cluster — Iterasi <?= $showIter ?></div>
+    <div class="card-title"><i data-lucide="ruler" style="width:15px;height:15px;color:var(--gold);"></i> Matriks Jarak Euclidean & Penugasan — Iterasi <?= $showIter ?></div>
   </div>
   <div class="card-body">
-    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 12px;">
-      <strong>Formula:</strong> d(x, c) = √[ (x₁-c₁)² + (x₂-c₂)² + ... + (xₙ-cₙ)² ] &nbsp;|&nbsp; Data ditetapkan ke cluster dengan jarak <strong>terkecil</strong> (ditandai hijau).
+    <div class="formula-box">
+      d(x, c) = √[ (x₁−c₁)² + (x₂−c₂)² + (x₃−c₃)² + (x₄−c₄)² + (x₅−c₅)² ] &nbsp;·&nbsp; Jarak terkecil → ditugaskan (✓)
     </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th style="min-width: 40px;">No</th>
-            <th style="min-width: 180px;">Nama Destinasi</th>
+            <th>No</th>
+            <th>Nama Destinasi</th>
             <?php for ($ci=0; $ci<$k; $ci++): ?>
-            <th style="background: <?= $km['colors'][$ci] ?>18; color: <?= $km['colors'][$ci] ?>; min-width: 100px;">
-              d(x, C<?= $ci+1 ?>)
-            </th>
+            <th style="color:<?= $km['colors'][$ci] ?>;">d(x, C<?= $ci+1 ?>)</th>
             <?php endfor; ?>
             <th>Cluster</th>
             <th>Jarak Min</th>
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($km['data'] as $i => $w): ?>
-          <?php $dm = $iterData['distance_matrix'][$i]; ?>
+          <?php foreach ($km['data'] as $i => $w): $dm = $iterData['distance_matrix'][$i]; ?>
           <tr>
-            <td style="color:var(--text-muted); font-weight:600;"><?= $w['id'] ?></td>
-            <td style="font-weight: 600; font-size: 12px;"><?= htmlspecialchars($w['nama']) ?></td>
-            <?php foreach ($dm['distances'] as $di => $dist): ?>
-            <?php $isMin = ($di === $dm['assigned']); ?>
-            <td style="font-family: monospace; font-size: 12px; font-weight: <?= $isMin ? '800' : '400' ?>; color: <?= $isMin ? '#059669' : 'var(--text-muted)' ?>; background: <?= $isMin ? '#f0fdf4' : 'transparent' ?>; border-radius: <?= $isMin ? '6px' : '0' ?>; position: relative;">
-              <?= $dist ?>
-              <?php if ($isMin): ?><span style="font-size:9px;"> ✓</span><?php endif; ?>
+            <td style="color:var(--text-3);font-weight:700;"><?= $w['id'] ?></td>
+            <td style="font-weight:700;color:var(--text);font-size:12px;"><?= htmlspecialchars($w['nama']) ?></td>
+            <?php foreach ($dm['distances'] as $di => $dist): $isMin = ($di === $dm['assigned']); ?>
+            <td class="mono" style="font-size:12px;font-weight:<?= $isMin?'800':'400' ?>;color:<?= $isMin?'var(--emerald)':'var(--text-3)' ?>;background:<?= $isMin?'rgba(16,185,129,0.07)':'transparent' ?>;">
+              <?= $dist ?><?= $isMin?' ✓':'' ?>
             </td>
             <?php endforeach; ?>
             <td>
-              <?php 
-              $clAssigned = $dm['assigned'];
-              $clsIcon = $km['icons'][$clAssigned] ?? 'low';
-              $clsClass = $clsIcon === 'high' ? 'cluster-high' : ($clsIcon === 'medium' ? 'cluster-medium' : 'cluster-low');
-              ?>
-              <span class="badge <?= $clsClass ?>">C<?= $clAssigned+1 ?></span>
+              <?php $ca=$dm['assigned'];$ic=$km['icons'][$ca]??'low';$cc=$ic==='high'?'cluster-high':($ic==='medium'?'cluster-medium':'cluster-low'); ?>
+              <span class="badge <?= $cc ?>">C<?= $ca+1 ?></span>
             </td>
-            <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--emerald);"><?= $dm['min_dist'] ?></td>
+            <td class="mono" style="font-weight:700;color:var(--emerald);font-size:12px;"><?= $dm['min_dist'] ?></td>
           </tr>
           <?php endforeach; ?>
         </tbody>
@@ -123,10 +112,10 @@ $fields = $km['fields'];
   </div>
 </div>
 
-<!-- Cluster summary for this iteration -->
+<!-- Ringkasan cluster iterasi ini -->
 <div class="card">
   <div class="card-header">
-    <div class="card-title">📊 Ringkasan Pengelompokan — Iterasi <?= $showIter ?></div>
+    <div class="card-title"><i data-lucide="users" style="width:15px;height:15px;color:var(--emerald);"></i> Anggota Per Cluster — Iterasi <?= $showIter ?></div>
   </div>
   <div class="card-body">
     <?php
@@ -137,17 +126,20 @@ $fields = $km['fields'];
         $clusterMembers[$c][] = $w['nama'];
     }
     ?>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-      <?php for ($ci=0; $ci<$k; $ci++): ?>
-      <div style="background: white; border: 1px solid var(--border); border-radius: 14px; overflow: hidden;">
-        <div style="background: <?= $km['colors'][$ci] ?>; padding: 12px 16px; color: white;">
-          <div style="font-weight: 800; font-size: 14px;">Cluster <?= $ci+1 ?></div>
-          <div style="font-size: 11px; opacity: 0.8;"><?= count($clusterMembers[$ci] ?? []) ?> destinasi wisata</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
+      <?php for ($ci=0; $ci<$k; $ci++): $cnt = count($clusterMembers[$ci] ?? []); ?>
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+        <div style="background:<?= $km['colors'][$ci] ?>;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:white;"><?= $km['labels'][$ci] ?></div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);"><?= $cnt ?> destinasi</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.2);border-radius:8px;padding:4px 10px;font-size:20px;font-weight:900;color:white;"><?= $cnt ?></div>
         </div>
-        <div style="padding: 12px 16px;">
+        <div style="padding:10px 14px;">
           <?php foreach ($clusterMembers[$ci] ?? [] as $name): ?>
-          <div style="display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid #f8fafc;">
-            <span style="color: <?= $km['colors'][$ci] ?>;">●</span>
+          <div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border);color:var(--text-2);">
+            <span style="color:<?= $km['colors'][$ci] ?>;font-size:8px;">●</span>
             <?= htmlspecialchars($name) ?>
           </div>
           <?php endforeach; ?>
