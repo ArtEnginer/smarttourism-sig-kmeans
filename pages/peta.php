@@ -4,27 +4,20 @@ require_once '../includes/kmeans.php';
 
 $k = isset($_GET['k']) ? max(2, min(5, (int)$_GET['k'])) : 3;
 $km = runKMeans($k);
+if (empty($km['data'])) {
+?>
+  <div class="page-content">
+    <div class="card">
+      <div class="card-body">
+        <div class="info-box blue">Belum ada data destinasi di database, sehingga peta tidak dapat ditampilkan.</div>
+      </div>
+    </div>
+  </div>
+<?php require_once '../includes/footer.php';
+  return;
+}
 
-$koordinat = [
-  1  => [-7.6079, 110.2038],
-  2  => [-7.5992, 110.2278],
-  3  => [-7.6035, 110.2196],
-  4  => [-7.5258, 110.3453],
-  5  => [-7.6226, 110.1875],
-  6  => [-7.5589, 110.4012],
-  7  => [-7.6011, 110.2156],
-  8  => [-7.5943, 110.2489],
-  9  => [-7.4712, 110.2177],
-  10 => [-7.5218, 110.2134],
-  11 => [-7.4706, 110.2123],
-  12 => [-7.4983, 110.3512],
-  13 => [-7.5031, 110.4198],
-  14 => [-7.6134, 110.1923],
-  15 => [-7.4695, 110.2195],
-];
-
-$jsonData = json_encode(array_map(function ($w) use ($koordinat, $km) {
-  $coord = $koordinat[$w['id']] ?? [-7.55, 110.25];
+$jsonData = json_encode(array_map(function ($w) {
   return [
     'id'            => $w['id'],
     'nama'          => $w['nama'],
@@ -40,8 +33,8 @@ $jsonData = json_encode(array_map(function ($w) use ($koordinat, $km) {
     'ulasan'        => $w['ulasan'],
     'rating'        => $w['rating'],
     'jumlah_pengunjung' => $w['jumlah_pengunjung'],
-    'lat'           => $coord[0],
-    'lng'           => $coord[1],
+    'lat'           => $w['lat'],
+    'lng'           => $w['lng'],
   ];
 }, $km['data']));
 $colorsJson = json_encode($km['colors']);
@@ -129,6 +122,14 @@ $labelsJson = json_encode($km['labels']);
         <?php endfor; ?>
       </div>
     </div>
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(180deg, rgba(16,185,129,0.05), rgba(255,255,255,0));display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);"><span style="width:10px;height:10px;border-radius:50%;background:var(--emerald);display:inline-block;"></span>Prioritas tinggi</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);"><span style="width:10px;height:10px;border-radius:50%;background:var(--gold);display:inline-block;"></span>Prioritas sedang</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);"><span style="width:10px;height:10px;border-radius:50%;background:var(--purple);display:inline-block;"></span>Prioritas rendah</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-3);">Klik marker untuk detail destinasi, lalu ganti jenis peta lewat kontrol di kanan atas.</div>
+    </div>
     <div id="map"></div>
   </div>
 </div>
@@ -144,10 +145,47 @@ $labelsJson = json_encode($km['labels']);
     zoomControl: true
   }).setView([-7.55, 110.25], 11);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 18,
-    attribution: '© CartoDB © OpenStreetMap contributors'
+  const baseLayers = {
+    'Peta Ringan': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© CartoDB © OpenStreetMap contributors'
+    }),
+    'Peta Jalan': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }),
+    'Peta Gelap': L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '© CartoDB © OpenStreetMap contributors'
+    }),
+    'Satelit': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles © Esri'
+    })
+  };
+
+  baseLayers['Peta Ringan'].addTo(map);
+  L.control.layers(baseLayers, null, {
+    position: 'topright',
+    collapsed: false
   }).addTo(map);
+  map.getContainer().classList.add('map-frame');
+
+  const clusterLegend = L.control({
+    position: 'bottomleft'
+  });
+  clusterLegend.onAdd = function() {
+    const div = L.DomUtil.create('div', 'map-legend');
+    div.innerHTML = `
+      <div class="map-legend-title">Legenda Cluster</div>
+      ${Object.entries(clusterLabels).map(([index, label]) => {
+        const color = clusterColors[index];
+        return `<div class="map-legend-row"><span class="legend-dot" style="background:${color}"></span><span>${label}</span></div>`;
+      }).join('')}
+    `;
+    return div;
+  };
+  clusterLegend.addTo(map);
 
   const labelMap = {
     high: 'H',
@@ -159,21 +197,21 @@ $labelsJson = json_encode($km['labels']);
     return L.divIcon({
       className: '',
       html: `<div style="
-      width:40px;height:40px;
+      width:42px;height:42px;
       background:${color};
-      border:3px solid rgba(255,255,255,0.9);
+      border:3px solid rgba(255,255,255,0.96);
       border-radius:50%;
       display:flex;align-items:center;justify-content:center;
       font-size:14px;
       font-weight:800;
       color:white;
-      box-shadow:0 4px 16px ${color}66, 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow:0 8px 24px ${color}55, 0 4px 10px rgba(15,23,42,0.22);
       cursor:pointer;
-      transition:transform 0.15s;
+      transition:transform 0.15s, box-shadow 0.15s;
     ">${labelMap[iconType] || 'C'}</div>`,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
-      popupAnchor: [0, -22]
+      iconSize: [42, 42],
+      iconAnchor: [21, 21],
+      popupAnchor: [0, -24]
     });
   }
 
@@ -207,5 +245,97 @@ $labelsJson = json_encode($km['labels']);
     padding: [40, 40]
   });
 </script>
+
+<style>
+  .map-frame {
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+  }
+
+  #map {
+    height: calc(100vh - 220px);
+    min-height: 560px;
+    background: linear-gradient(180deg, #e2e8f0, #f8fafc);
+  }
+
+  .leaflet-control-layers {
+    border: 1px solid rgba(148, 163, 184, 0.24) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12) !important;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(10px);
+  }
+
+  .leaflet-control-layers-expanded {
+    padding: 10px 12px 8px !important;
+    color: var(--text);
+  }
+
+  .leaflet-control-layers label {
+    font-size: 12px;
+    line-height: 1.55;
+    margin-bottom: 4px;
+    cursor: pointer;
+  }
+
+  .leaflet-control-layers-selector {
+    accent-color: var(--emerald);
+  }
+
+  .map-legend {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    padding: 12px 14px;
+    min-width: 160px;
+    color: var(--text);
+  }
+
+  .map-legend-title {
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+
+  .map-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-2);
+    margin-bottom: 7px;
+  }
+
+  .map-legend-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9);
+    flex-shrink: 0;
+  }
+
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25) !important;
+  }
+
+  .leaflet-container a.leaflet-popup-close-button {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-radius: 10px 0 0 0;
+    padding: 2px 8px !important;
+    font-size: 10px !important;
+  }
+</style>
 
 <?php require_once '../includes/footer.php'; ?>

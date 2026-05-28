@@ -1,9 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['user'])) {
-  header('Location: ../index.php');
-  exit;
-}
+require_once __DIR__ . '/auth.php';
+requireLogin();
+
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 $navItems = [
   'dashboard' => ['icon' => 'layout-dashboard', 'label' => 'Dashboard'],
@@ -13,7 +11,19 @@ $navItems = [
   'hasil' => ['icon' => 'bar-chart-3', 'label' => 'Hasil Clustering'],
   'peta' => ['icon' => 'map', 'label' => 'Peta Interaktif'],
 ];
-$currentNav = $navItems[$currentPage] ?? ['icon' => 'circle', 'label' => ucfirst($currentPage)];
+$user = getCurrentUser();
+$isAdminUser = $user && (($user['role'] ?? '') === 'admin');
+$adminNavItems = $isAdminUser ? [
+  'admin/dashboard' => ['icon' => 'shield-check', 'label' => 'Admin Dashboard'],
+  'admin/destinasi' => ['icon' => 'settings-2', 'label' => 'Kelola Destinasi'],
+  'admin/users' => ['icon' => 'users', 'label' => 'Kelola Pengguna'],
+] : [];
+$allNavItems = $isAdminUser ? $adminNavItems : $navItems;
+$currentPageKey = basename(dirname($_SERVER['PHP_SELF'])) === 'admin'
+  ? '' . basename($_SERVER['PHP_SELF'], '.php')
+  : $currentPage;
+$currentNav = $allNavItems[$currentPageKey] ?? $navItems[$currentPage] ?? ['icon' => 'circle', 'label' => ucfirst($currentPage)];
+$navBasePath = $isAdminUser ? '' : 'pages/';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -314,6 +324,139 @@ $currentNav = $navItems[$currentPage] ?? ['icon' => 'circle', 'label' => ucfirst
       padding: 28px;
       flex: 1;
       max-width: 1400px;
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .page-hero-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--slate);
+      letter-spacing: -0.2px;
+      margin-bottom: 6px;
+    }
+
+    .page-hero-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .page-hero-meta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .page-hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .page-hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-body {
+      padding: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      color: var(--text);
+      font: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: rgba(5, 150, 105, 0.45);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.08);
+    }
+
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .notice {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      border: 1px solid transparent;
+    }
+
+    .notice-success {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #047857;
+    }
+
+    .notice-muted {
+      background: #f8fafc;
+      border-color: var(--border);
+      color: var(--text-muted);
     }
 
     /* ========== CARDS ========== */
@@ -647,9 +790,9 @@ $currentNav = $navItems[$currentPage] ?? ['icon' => 'circle', 'label' => ucfirst
         </div>
       </div>
       <nav class="sidebar-nav">
-        <div class="nav-section-label">Menu Utama</div>
-        <?php foreach ($navItems as $page => $item): ?>
-          <a href="<?= $page ?>.php" class="nav-item <?= $currentPage === $page ? 'active' : '' ?>">
+        <div class="nav-section-label"><?= $isAdminUser ? 'Menu Admin' : 'Menu Utama' ?></div>
+        <?php foreach ($allNavItems as $page => $item): ?>
+          <a href="<?= htmlspecialchars(appUrl($navBasePath . $page . '.php')) ?>" class="nav-item <?= $currentPageKey === $page ? 'active' : '' ?>">
             <span class="nav-icon"><i data-lucide="<?= $item['icon'] ?>"></i></span>
             <span><?= $item['label'] ?></span>
             <?php if ($page === 'clustering'): ?>
@@ -660,12 +803,14 @@ $currentNav = $navItems[$currentPage] ?? ['icon' => 'circle', 'label' => ucfirst
       </nav>
       <div class="sidebar-footer">
         <div class="user-card">
-          <div class="user-avatar">A</div>
+          <?php $u = getCurrentUser();
+          $initial = strtoupper(substr($u['nama_lengkap'] ?? ($u['username'] ?? 'U'), 0, 1)); ?>
+          <div class="user-avatar"><?= htmlspecialchars($initial) ?></div>
           <div>
-            <div class="user-name">Administrator</div>
-            <div class="user-role">Super Admin</div>
+            <div class="user-name"><?= htmlspecialchars($u['nama_lengkap'] ?? $u['username']) ?></div>
+            <div class="user-role"><?= htmlspecialchars(ucfirst($u['role'] ?? 'user')) ?></div>
           </div>
-          <form method="POST" action="../logout.php" style="margin:0">
+          <form method="POST" action="<?= htmlspecialchars(appUrl('logout.php')) ?>" style="margin:0">
             <button type="submit" class="logout-btn">Keluar</button>
           </form>
         </div>

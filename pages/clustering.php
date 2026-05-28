@@ -117,7 +117,7 @@ $normMeta = $km['norm_meta'];
       <div class="info-box blue">
         <strong>Metode:</strong> Uniform Sampling — memilih setiap ke-<?= $km['init_step'] ?> data sebagai centroid awal untuk K=<?= $k ?>.
         <?php if ($k === 3): ?>
-          &nbsp; C1 = baris 1 (Candi Borobudur), C2 = baris 6 (Air Terjun Kedung Kayang), C3 = baris 11 (Taman Kyai Langgeng).
+          &nbsp; Untuk K=3, centroid awal mengikuti urutan data pertama, keenam, dan kesebelas dari database.
         <?php endif; ?>
       </div>
       <?php if (!empty($km['history'])): $initCentroids = $km['history'][0]['centroids']; ?>

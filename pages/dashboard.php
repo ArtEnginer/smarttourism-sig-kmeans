@@ -7,20 +7,23 @@ $clusterCounts = array_count_values(array_column($data, 'cluster'));
 $totalWisata = count($data);
 $rawData = getWisataData();
 $totalPengunjung = array_sum(array_column($rawData, 'jumlah_pengunjung'));
-$avgRating = round(array_sum(array_column($rawData, 'rating')) / $totalWisata, 2);
+$avgRating = $totalWisata > 0 ? round(array_sum(array_column($rawData, 'rating')) / $totalWisata, 2) : 0;
 ?>
 <div class="page-content">
-
-  <!-- Banner -->
-  <div style="background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #0f172a 100%); border-radius: 18px; padding: 28px 32px; margin-bottom: 24px; position: relative; overflow: hidden; border: 1px solid rgba(16,185,129,0.2);">
-    <div style="position:absolute;right:-30px;top:-30px;width:180px;height:180px;background:rgba(16,185,129,0.06);border-radius:50%;"></div>
-    <div style="position:absolute;right:80px;bottom:-50px;width:130px;height:130px;background:rgba(16,185,129,0.04);border-radius:50%;"></div>
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Kabupaten Magelang</div>
-    <h1 style="font-family:'Instrument Serif',serif;font-size:26px;font-style:italic;color:white;margin-bottom:6px;position:relative;">Sistem Pemetaan Potensi Wisata</h1>
-    <p style="font-size:12px;color:rgba(255,255,255,0.5);position:relative;">Berbasis Algoritma K-Means Clustering &nbsp;·&nbsp; 2 Iterasi &nbsp;·&nbsp; SSE = <?= $km['sse'] ?></p>
-    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
-      <a href="clustering.php" style="background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:7px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;">Lihat Clustering →</a>
-      <a href="peta.php" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);padding:7px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;">Buka Peta</a>
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-title">Sistem Pemetaan Potensi Wisata</div>
+      <div class="page-hero-subtitle">Ringkasan destinasi Kabupaten Magelang, hasil clustering K-Means, dan distribusi data yang langsung terhubung ke database.</div>
+    </div>
+    <div class="page-hero-meta">
+      <span class="page-hero-chip">Kabupaten Magelang</span>
+      <span class="page-hero-chip">K = <?= $km['k'] ?></span>
+      <span class="page-hero-chip">Iterasi <?= $km['iterations'] ?></span>
+      <span class="page-hero-chip">SSE <?= $km['sse'] ?></span>
+      <div class="page-hero-actions">
+        <a href="clustering.php" class="btn btn-primary btn-sm">Lihat Clustering</a>
+        <a href="peta.php" class="btn btn-secondary btn-sm">Buka Peta</a>
+      </div>
     </div>
   </div>
 
@@ -73,7 +76,7 @@ $avgRating = round(array_sum(array_column($rawData, 'rating')) / $totalWisata, 2
             </div>
           </div>
         <?php endforeach; ?>
-        <div style="margin-top:14px;padding:10px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--text-3);display:flex;gap:16px;">
+        <div style="margin-top:14px;padding:10px 14px;background:var(--slate-pale);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--text-muted);display:flex;gap:16px;flex-wrap:wrap;">
           <span>SSE: <strong style="color:var(--text);font-family:var(--mono);"><?= $km['sse'] ?></strong></span>
           <span>K = <strong style="color:var(--text);"><?= $km['k'] ?></strong></span>
           <span>Iterasi: <strong style="color:var(--text);"><?= $km['iterations'] ?></strong></span>
@@ -120,7 +123,7 @@ $avgRating = round(array_sum(array_column($rawData, 'rating')) / $totalWisata, 2
       $jenisCounts = [];
       foreach ($rawData as $w) $jenisCounts[$w['jenis']] = ($jenisCounts[$w['jenis']] ?? 0) + 1;
       $jenisColors = ['Budaya' => 'var(--emerald)', 'Alam' => 'var(--blue)', 'Desa Wisata' => 'var(--gold)', 'Religi' => 'var(--purple)', 'Taman' => 'var(--red)'];
-      $maxCount = max($jenisCounts);
+      $maxCount = $jenisCounts ? max($jenisCounts) : 0;
       ?>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;">
         <?php foreach ($jenisCounts as $jenis => $cnt): ?>
@@ -128,7 +131,7 @@ $avgRating = round(array_sum(array_column($rawData, 'rating')) / $totalWisata, 2
             <div style="font-size:30px;font-weight:800;color:<?= $jenisColors[$jenis] ?? 'var(--text-2)' ?>;margin-bottom:4px;"><?= $cnt ?></div>
             <div style="font-size:12px;color:var(--text-3);font-weight:600;margin-bottom:10px;"><?= $jenis ?></div>
             <div class="progress-bar">
-              <div class="progress-fill" style="width:<?= round($cnt / $maxCount * 100) ?>%;background:<?= $jenisColors[$jenis] ?? 'var(--text-3)' ?>;"></div>
+              <div class="progress-fill" style="width:<?= $maxCount > 0 ? round($cnt / $maxCount * 100) : 0 ?>%;background:<?= $jenisColors[$jenis] ?? 'var(--text-3)' ?>;"></div>
             </div>
           </div>
         <?php endforeach; ?>

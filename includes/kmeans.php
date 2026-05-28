@@ -1,32 +1,61 @@
 <?php
-// ============================================================
-// DATA POTENSI WISATA KABUPATEN MAGELANG
-// ============================================================
-function getWisataData()
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/database.php';
+
+function getWisataData(): array
 {
-    return [
-        ['id' => 1, 'nama' => 'Candi Borobudur', 'jenis' => 'Budaya', 'daya_tarik' => 9, 'aksesibilitas' => 9, 'fasilitas' => 8, 'jumlah_pengunjung' => 850000, 'blok_bangunan' => 5, 'sarana' => 9, 'ulasan' => 4.8, 'rating' => 4.8],
-        ['id' => 2, 'nama' => 'Candi Mendut', 'jenis' => 'Budaya', 'daya_tarik' => 8, 'aksesibilitas' => 8, 'fasilitas' => 7, 'jumlah_pengunjung' => 180000, 'blok_bangunan' => 4, 'sarana' => 7, 'ulasan' => 4.5, 'rating' => 4.5],
-        ['id' => 3, 'nama' => 'Candi Pawon', 'jenis' => 'Budaya', 'daya_tarik' => 7, 'aksesibilitas' => 7, 'fasilitas' => 6, 'jumlah_pengunjung' => 95000, 'blok_bangunan' => 3, 'sarana' => 6, 'ulasan' => 4.2, 'rating' => 4.2],
-        ['id' => 4, 'nama' => 'Ketep Pass', 'jenis' => 'Alam', 'daya_tarik' => 9, 'aksesibilitas' => 7, 'fasilitas' => 8, 'jumlah_pengunjung' => 320000, 'blok_bangunan' => 4, 'sarana' => 7, 'ulasan' => 4.6, 'rating' => 4.6],
-        ['id' => 5, 'nama' => 'Punthuk Setumbu', 'jenis' => 'Alam', 'daya_tarik' => 9, 'aksesibilitas' => 6, 'fasilitas' => 7, 'jumlah_pengunjung' => 210000, 'blok_bangunan' => 3, 'sarana' => 6, 'ulasan' => 4.7, 'rating' => 4.7],
-        ['id' => 6, 'nama' => 'Air Terjun Kedung Kayang', 'jenis' => 'Alam', 'daya_tarik' => 8, 'aksesibilitas' => 5, 'fasilitas' => 5, 'jumlah_pengunjung' => 75000, 'blok_bangunan' => 2, 'sarana' => 5, 'ulasan' => 4.3, 'rating' => 4.3],
-        ['id' => 7, 'nama' => 'Desa Wisata Candirejo', 'jenis' => 'Desa Wisata', 'daya_tarik' => 7, 'aksesibilitas' => 7, 'fasilitas' => 6, 'jumlah_pengunjung' => 45000, 'blok_bangunan' => 3, 'sarana' => 6, 'ulasan' => 4.4, 'rating' => 4.4],
-        ['id' => 8, 'nama' => 'Desa Wisata Ngargogondo', 'jenis' => 'Desa Wisata', 'daya_tarik' => 6, 'aksesibilitas' => 6, 'fasilitas' => 5, 'jumlah_pengunjung' => 32000, 'blok_bangunan' => 2, 'sarana' => 5, 'ulasan' => 4.1, 'rating' => 4.1],
-        ['id' => 9, 'nama' => 'Masjid Agung Magelang', 'jenis' => 'Religi', 'daya_tarik' => 7, 'aksesibilitas' => 9, 'fasilitas' => 8, 'jumlah_pengunjung' => 280000, 'blok_bangunan' => 4, 'sarana' => 8, 'ulasan' => 4.5, 'rating' => 4.5],
-        ['id' => 10, 'nama' => 'Makam Kyai Raden Santri', 'jenis' => 'Religi', 'daya_tarik' => 6, 'aksesibilitas' => 7, 'fasilitas' => 5, 'jumlah_pengunjung' => 120000, 'blok_bangunan' => 2, 'sarana' => 5, 'ulasan' => 4.0, 'rating' => 4.0],
-        ['id' => 11, 'nama' => 'Taman Kyai Langgeng', 'jenis' => 'Taman', 'daya_tarik' => 8, 'aksesibilitas' => 9, 'fasilitas' => 8, 'jumlah_pengunjung' => 350000, 'blok_bangunan' => 4, 'sarana' => 8, 'ulasan' => 4.4, 'rating' => 4.4],
-        ['id' => 12, 'nama' => 'Kebun Teh Ngluwar', 'jenis' => 'Alam', 'daya_tarik' => 7, 'aksesibilitas' => 6, 'fasilitas' => 5, 'jumlah_pengunjung' => 55000, 'blok_bangunan' => 2, 'sarana' => 5, 'ulasan' => 4.2, 'rating' => 4.2],
-        ['id' => 13, 'nama' => 'Gunung Merbabu (basecamp)', 'jenis' => 'Alam', 'daya_tarik' => 9, 'aksesibilitas' => 5, 'fasilitas' => 5, 'jumlah_pengunjung' => 42000, 'blok_bangunan' => 2, 'sarana' => 4, 'ulasan' => 4.6, 'rating' => 4.6],
-        ['id' => 14, 'nama' => 'Sunrise Puthuk Mongkrong', 'jenis' => 'Alam', 'daya_tarik' => 8, 'aksesibilitas' => 5, 'fasilitas' => 4, 'jumlah_pengunjung' => 28000, 'blok_bangunan' => 1, 'sarana' => 4, 'ulasan' => 4.5, 'rating' => 4.5],
-        ['id' => 15, 'nama' => 'Museum Diponegoro', 'jenis' => 'Budaya', 'daya_tarik' => 6, 'aksesibilitas' => 8, 'fasilitas' => 7, 'jumlah_pengunjung' => 85000, 'blok_bangunan' => 3, 'sarana' => 7, 'ulasan' => 4.1, 'rating' => 4.1],
-    ];
+    try {
+        $pdo = getDatabaseConnection();
+        $stmt = $pdo->query(
+            "SELECT
+                id,
+                nama_destinasi AS nama,
+                kategori AS jenis,
+                daya_tarik,
+                aksesibilitas,
+                fasilitas,
+                sarana,
+                ulasan,
+                jumlah_pengunjung,
+                rating,
+                latitude AS lat,
+                longitude AS lng
+            FROM tb_destinasi
+            WHERE status = 'aktif'
+            ORDER BY id ASC"
+        );
+
+        $rows = $stmt->fetchAll();
+
+        return array_map(static function (array $row): array {
+            return [
+                'id' => (int) $row['id'],
+                'nama' => (string) $row['nama'],
+                'jenis' => (string) $row['jenis'],
+                'daya_tarik' => (float) $row['daya_tarik'],
+                'aksesibilitas' => (float) $row['aksesibilitas'],
+                'fasilitas' => (float) $row['fasilitas'],
+                'sarana' => (float) $row['sarana'],
+                'ulasan' => (float) $row['ulasan'],
+                'jumlah_pengunjung' => (int) $row['jumlah_pengunjung'],
+                'rating' => (float) $row['rating'],
+                'lat' => (float) $row['lat'],
+                'lng' => (float) $row['lng'],
+            ];
+        }, $rows);
+    } catch (Throwable $e) {
+        error_log('SmartTourism database error: ' . $e->getMessage());
+
+        return [];
+    }
 }
 
 // ============================================================
 // K-MEANS CLUSTERING ALGORITHM
 // ============================================================
-function normalizeData($data, $fields)
+function normalizeData(array $data, array $fields): array
 {
     $min = [];
     $max = [];
@@ -47,7 +76,7 @@ function normalizeData($data, $fields)
     return ['data' => $normalized, 'min' => $min, 'max' => $max];
 }
 
-function euclideanDistance($a, $b, $fields)
+function euclideanDistance(array $a, array $b, array $fields): float
 {
     $sum = 0;
     foreach ($fields as $f) {
@@ -57,10 +86,42 @@ function euclideanDistance($a, $b, $fields)
     return sqrt($sum);
 }
 
-function kMeansClustering($data, $k = 3, $fields = [], $maxIter = 100)
+function buildEmptyKMeansResult(int $k, array $fields): array
+{
+    $fieldLabels = [
+        'daya_tarik' => 'Daya Tarik',
+        'aksesibilitas' => 'Aksesibilitas',
+        'fasilitas' => 'Fasilitas',
+        'sarana' => 'Sarana',
+        'ulasan' => 'Ulasan',
+    ];
+
+    return [
+        'data' => [],
+        'centroids' => [],
+        'history' => [],
+        'iterations' => 0,
+        'converged' => false,
+        'sse' => 0,
+        'labels' => [],
+        'colors' => [],
+        'icons' => [],
+        'k' => $k,
+        'fields' => $fields,
+        'fields_label' => $fieldLabels,
+        'norm_meta' => [
+            'min' => array_fill_keys($fields, 0),
+            'max' => array_fill_keys($fields, 0),
+        ],
+        'init_step' => 1,
+        'empty' => true,
+    ];
+}
+
+function kMeansClustering(array $data, int $k = 3, array $fields = [], int $maxIter = 100): array
 {
     $n = count($data);
-    $history = []; // store each iteration
+    $history = [];
     $palette = [
         '#059669',
         '#d97706',
@@ -71,10 +132,10 @@ function kMeansClustering($data, $k = 3, $fields = [], $maxIter = 100)
     $iconPalette = ['high', 'medium', 'low', 'medium', 'low'];
 
     // Initialize centroids - pick first k points spread out
-    $step = (int)($n / $k);
+    $step = max(1, (int) floor($n / $k));
     $centroids = [];
     for ($i = 0; $i < $k; $i++) {
-        $idx = $i * $step;
+        $idx = min($i * $step, $n - 1);
         if ($idx >= $n) {
             $idx = $n - 1;
         }
@@ -215,17 +276,17 @@ function kMeansClustering($data, $k = 3, $fields = [], $maxIter = 100)
         'k' => $k,
         'fields' => $fields,
         'init_step' => max(1, $step),
+        'empty' => false,
     ];
 }
 
-function runKMeans($k = 3)
+function runKMeans(int $k = 3): array
 {
     $raw = getWisataData();
     $fields = ['daya_tarik', 'aksesibilitas', 'fasilitas', 'sarana', 'ulasan'];
 
-    // Normalize jumlah_pengunjung into scale 1-10 for better comparison
-    foreach ($raw as &$r) {
-        $r['pengunjung_norm_raw'] = $r['jumlah_pengunjung'];
+    if (empty($raw)) {
+        return buildEmptyKMeansResult($k, $fields);
     }
 
     $normResult = normalizeData($raw, $fields);
