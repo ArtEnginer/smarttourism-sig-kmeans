@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/env.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -55,15 +57,28 @@ function appUrl(string $path = ''): string
     static $baseUrl = null;
 
     if ($baseUrl === null) {
-        $scriptName = $_SERVER['SCRIPT_NAME'];
+        // Cek apakah APP_URL diset di environment / .env
+        $envUrl = getenv('APP_URL');
+        if ($envUrl !== false && $envUrl !== '') {
+            $baseUrl = rtrim($envUrl, '/');
+        } else {
+            // Ambil document root dari server
+            $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
 
-        // Cari posisi folder project
-        $parts = explode('/', trim($scriptName, '/'));
+            // Ambil direktori file ini (auth.php / config.php berada)
+            // Lalu naik ke root project
+            $projectRoot = rtrim(dirname(__DIR__), '/');
+            // Kalau file ini sudah di root project, pakai dirname(__FILE__)
+            // sesuaikan dengan posisi file ini
 
-        // contoh:
-        // PKMUQOROBIN/smartourism/pages/dashboard.php
-        $baseUrl = '/' . $parts[0] . '/' . $parts[1];
+            // Hitung relative path dari document root ke project root
+            $relativePath = str_replace($docRoot, '', $projectRoot);
+
+            $baseUrl = '/' . trim($relativePath, '/');
+        }
     }
 
-    return $baseUrl . '/' . ltrim($path, '/');
+    // Hindari double slash
+    $suffix = $path !== '' ? '/' . ltrim($path, '/') : '';
+    return $baseUrl . $suffix;
 }
