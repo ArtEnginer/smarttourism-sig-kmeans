@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS smartourism CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE smartourism;
+CREATE DATABASE IF NOT EXISTS sql_smartourism_mediapatner_com CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE sql_smartourism_mediapatner_com;
 
 DROP TABLE IF EXISTS tb_destinasi;
 DROP TABLE IF EXISTS tb_users;

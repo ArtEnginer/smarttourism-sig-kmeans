@@ -2,28 +2,81 @@
 require_once __DIR__ . '/auth.php';
 requireLogin();
 
-$currentPage = basename($_SERVER['PHP_SELF'], '.php');
-$navItems = [
-  'dashboard' => ['icon' => 'layout-dashboard', 'label' => 'Dashboard'],
-  'data_wisata' => ['icon' => 'database', 'label' => 'Data Wisata'],
-  'clustering' => ['icon' => 'brain-circuit', 'label' => 'K-Means Clustering'],
-  'iterasi' => ['icon' => 'history', 'label' => 'Detail Iterasi'],
-  'hasil' => ['icon' => 'bar-chart-3', 'label' => 'Hasil Clustering'],
-  'peta' => ['icon' => 'map', 'label' => 'Peta Interaktif'],
-];
 $user = getCurrentUser();
 $isAdminUser = $user && (($user['role'] ?? '') === 'admin');
-$adminNavItems = $isAdminUser ? [
-  'admin/dashboard' => ['icon' => 'shield-check', 'label' => 'Admin Dashboard'],
-  'admin/destinasi' => ['icon' => 'settings-2', 'label' => 'Kelola Destinasi'],
-  'admin/users' => ['icon' => 'users', 'label' => 'Kelola Pengguna'],
-] : [];
-$allNavItems = $isAdminUser ? $adminNavItems : $navItems;
-$currentPageKey = basename(dirname($_SERVER['PHP_SELF'])) === 'admin'
-  ? '' . basename($_SERVER['PHP_SELF'], '.php')
-  : $currentPage;
-$currentNav = $allNavItems[$currentPageKey] ?? $navItems[$currentPage] ?? ['icon' => 'circle', 'label' => ucfirst($currentPage)];
-$navBasePath = $isAdminUser ? '' : 'pages/';
+
+$currentPage = basename($_SERVER['PHP_SELF'], '.php');
+
+/*
+|--------------------------------------------------------------------------
+| MENU USER
+|--------------------------------------------------------------------------
+*/
+$userNavItems = [
+  'dashboard' => [
+    'icon'  => 'layout-dashboard',
+    'label' => 'Dashboard',
+    'url'   => appUrl('pages/dashboard.php')
+  ],
+  'data_wisata' => [
+    'icon'  => 'database',
+    'label' => 'Data Wisata',
+    'url'   => appUrl('pages/data_wisata.php')
+  ],
+  'clustering' => [
+    'icon'  => 'brain-circuit',
+    'label' => 'K-Means Clustering',
+    'url'   => appUrl('pages/clustering.php')
+  ],
+  'iterasi' => [
+    'icon'  => 'history',
+    'label' => 'Detail Iterasi',
+    'url'   => appUrl('pages/iterasi.php')
+  ],
+  'hasil' => [
+    'icon'  => 'bar-chart-3',
+    'label' => 'Hasil Clustering',
+    'url'   => appUrl('pages/hasil.php')
+  ],
+  'peta' => [
+    'icon'  => 'map',
+    'label' => 'Peta Interaktif',
+    'url'   => appUrl('pages/peta.php')
+  ],
+];
+
+/*
+|--------------------------------------------------------------------------
+| MENU ADMIN
+|--------------------------------------------------------------------------
+*/
+$adminNavItems = [
+  'dashboard' => [
+    'icon'  => 'shield-check',
+    'label' => 'Admin Dashboard',
+    'url'   => appUrl('admin/dashboard.php')
+  ],
+  'destinasi' => [
+    'icon'  => 'settings-2',
+    'label' => 'Kelola Destinasi',
+    'url'   => appUrl('admin/destinasi.php')
+  ],
+  'users' => [
+    'icon'  => 'users',
+    'label' => 'Kelola Pengguna',
+    'url'   => appUrl('admin/users.php')
+  ],
+];
+
+$allNavItems = $isAdminUser ? $adminNavItems : $userNavItems;
+
+$currentPageKey = basename($_SERVER['PHP_SELF'], '.php');
+
+$currentNav = $allNavItems[$currentPageKey]
+  ?? [
+    'icon' => 'circle',
+    'label' => ucfirst($currentPage)
+  ];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -790,11 +843,20 @@ $navBasePath = $isAdminUser ? '' : 'pages/';
         </div>
       </div>
       <nav class="sidebar-nav">
-        <div class="nav-section-label"><?= $isAdminUser ? 'Menu Admin' : 'Menu Utama' ?></div>
+        <div class="nav-section-label">
+          <?= $isAdminUser ? 'Menu Admin' : 'Menu Utama' ?>
+        </div>
+
         <?php foreach ($allNavItems as $page => $item): ?>
-          <a href="<?= htmlspecialchars(appUrl($navBasePath . $page . '.php')) ?>" class="nav-item <?= $currentPageKey === $page ? 'active' : '' ?>">
-            <span class="nav-icon"><i data-lucide="<?= $item['icon'] ?>"></i></span>
-            <span><?= $item['label'] ?></span>
+          <a href="<?= htmlspecialchars($item['url']) ?>"
+            class="nav-item <?= ($currentPageKey === $page) ? 'active' : '' ?>">
+
+            <span class="nav-icon">
+              <i data-lucide="<?= $item['icon'] ?>"></i>
+            </span>
+
+            <span><?= htmlspecialchars($item['label']) ?></span>
+
             <?php if ($page === 'clustering'): ?>
               <span class="nav-badge">AI</span>
             <?php endif; ?>

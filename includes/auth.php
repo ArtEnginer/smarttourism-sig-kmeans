@@ -28,7 +28,8 @@ function getCurrentUser(): ?array
 function requireLogin(): void
 {
     if (!isLoggedIn()) {
-        header('Location: /MUQOROBIN/smartourism/index.php');
+        http_response_code(401);
+        echo '<h2>401 Unauthorized</h2><p>Anda harus masuk untuk melihat halaman ini.</p>';
         exit;
     }
 }
@@ -51,5 +52,18 @@ function requireAdmin(): void
 
 function appUrl(string $path = ''): string
 {
-    return '/MUQOROBIN/smartourism/' . ltrim($path, '/');
+    static $baseUrl = null;
+
+    if ($baseUrl === null) {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+
+        // Cari posisi folder project
+        $parts = explode('/', trim($scriptName, '/'));
+
+        // contoh:
+        // PKMUQOROBIN/smartourism/pages/dashboard.php
+        $baseUrl = '/' . $parts[0] . '/' . $parts[1];
+    }
+
+    return $baseUrl . '/' . ltrim($path, '/');
 }

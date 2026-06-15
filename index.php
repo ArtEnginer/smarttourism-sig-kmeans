@@ -539,10 +539,6 @@ if ($currentUser) {
         <button type="submit" class="btn">Masuk ke Sistem</button>
       </form>
 
-      <div class="support-row">
-        <span>Akun awal tersedia di database MySQL.</span>
-        <strong>Role-based access aktif</strong>
-      </div>
 
       <div class="brand-mini">SmarTourism Magelang · Dashboard Wisata dan Clustering</div>
     </section>
