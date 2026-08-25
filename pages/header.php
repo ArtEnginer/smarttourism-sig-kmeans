@@ -272,7 +272,7 @@ $navItems = [
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-logo">
-      <div class="brand-icon">🏛</div>
+      <div class="brand-icon"><i data-lucide="compass" style="width:20px;height:20px;color:white;"></i></div>
       <div>
         <div class="brand-name">SmarTourism</div>
         <div class="brand-sub">Kab. Magelang</div>

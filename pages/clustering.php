@@ -150,7 +150,7 @@ $normMeta = $km['norm_meta'];
     <div class="card-body">
       <div class="formula-box">
         <div class="formula-title">Formula Euclidean Distance</div>
-        d(x, c) = √[ Σ (xᵢ − cᵢ)² ] &nbsp;&nbsp;·&nbsp;&nbsp; Data → cluster dengan jarak terkecil (ditandai ✓)
+        d(x, c) = √[ Σ (xᵢ − cᵢ)² ] &nbsp;&nbsp;·&nbsp;&nbsp; Data → cluster dengan jarak terkecil (nilai minimum)
       </div>
       <?php if (!empty($km['history'])): $iter1 = $km['history'][0]; ?>
         <div class="table-wrap">
@@ -172,7 +172,7 @@ $normMeta = $km['norm_meta'];
                   <td style="font-weight:700;color:var(--text);"><?= htmlspecialchars($w['nama']) ?></td>
                   <?php foreach ($dm['distances'] as $di => $dist): $isMin = ($di === $dm['assigned']); ?>
                     <td class="mono" style="font-size:12px;font-weight:<?= $isMin ? '800' : '400' ?>;color:<?= $isMin ? 'var(--emerald)' : 'var(--text-3)' ?>;background:<?= $isMin ? 'rgba(16,185,129,0.07)' : 'transparent' ?>;">
-                      <?= $dist ?><?= $isMin ? ' ✓' : '' ?>
+                      <?= $dist ?><?= $isMin ? ' (Terpilih)' : '' ?>
                     </td>
                   <?php endforeach; ?>
                   <td>

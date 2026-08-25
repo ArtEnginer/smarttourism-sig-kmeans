@@ -42,66 +42,69 @@ $labelsJson = json_encode($km['labels']);
 ?>
 <style>
   #map {
-    height: calc(100vh - 200px);
-    min-height: 500px;
-    border-radius: 0 0 14px 14px;
+    height: calc(100vh - 210px);
+    min-height: 480px;
+    border-radius: 0 0 var(--radius) var(--radius);
     overflow: hidden;
+    z-index: 1;
   }
 
   .leaflet-popup-content-wrapper {
-    background: #111827;
-    border: 1px solid #1e2d42;
-    border-radius: 12px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-    color: #f1f5f9;
+    background: #ffffff;
+    border: 1px solid var(--emerald-border);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    color: var(--slate);
   }
 
   .leaflet-popup-tip {
-    background: #111827;
+    background: #ffffff;
   }
 
   .leaflet-popup-content {
     margin: 0;
     padding: 0;
-    min-width: 220px;
+    min-width: 230px;
   }
 
   .popup-header {
-    padding: 10px 14px;
+    padding: 11px 14px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     color: white;
-    border-radius: 12px 12px 0 0;
+    border-radius: 13px 13px 0 0;
   }
 
   .popup-body {
-    padding: 12px 14px;
+    padding: 14px;
   }
 
   .popup-name {
-    font-size: 14px;
+    font-size: 14.5px;
     font-weight: 800;
-    color: #f1f5f9;
+    color: var(--slate);
     margin-bottom: 2px;
   }
 
   .popup-jenis {
-    font-size: 11px;
-    color: #64748b;
+    font-size: 11.5px;
+    color: var(--slate-light);
     margin-bottom: 10px;
+    font-weight: 600;
   }
 
   .popup-row {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    padding: 3px 0;
-    border-bottom: 1px solid #1e2d42;
-    color: #94a3b8;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--slate-light);
   }
 
   .popup-row strong {
-    color: #f1f5f9;
+    color: var(--slate);
+    font-weight: 700;
   }
 </style>
 

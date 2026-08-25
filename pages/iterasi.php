@@ -35,7 +35,7 @@ $fieldsLabel = $km['fields_label'];
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <?php for ($it = 1; $it <= $totalIter; $it++): ?>
               <a href="?k=<?= $k ?>&iter=<?= $it ?>" class="btn <?= $it === $showIter ? 'btn-primary' : 'btn-secondary' ?> btn-sm">
-                Iterasi <?= $it ?><?= $it === $totalIter ? ' ✓' : '' ?>
+                Iterasi <?= $it ?><?= $it === $totalIter ? ' (Akhir)' : '' ?>
               </a>
             <?php endfor; ?>
           </div>
@@ -45,9 +45,9 @@ $fieldsLabel = $km['fields_label'];
         </div>
         <div class="info-box <?= $showIter === $totalIter ? 'green' : 'blue' ?>">
           <?php if ($showIter === $totalIter): ?>
-            ✅ <strong>Iterasi <?= $showIter ?> (Terakhir)</strong> — Centroid tidak berubah dari iterasi sebelumnya → <strong>KONVERGEN</strong>
+            <i data-lucide="check-circle-2" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px;"></i> <strong>Iterasi <?= $showIter ?> (Terakhir)</strong> — Centroid tidak berubah dari iterasi sebelumnya → <strong>KONVERGEN</strong>
           <?php else: ?>
-            🔄 <strong>Iterasi <?= $showIter ?> dari <?= $totalIter ?></strong> — Memperbarui penugasan dan menghitung centroid baru...
+            <i data-lucide="refresh-cw" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px;"></i> <strong>Iterasi <?= $showIter ?> dari <?= $totalIter ?></strong> — Memperbarui penugasan dan menghitung centroid baru...
           <?php endif; ?>
         </div>
       </div>
@@ -82,7 +82,7 @@ $fieldsLabel = $km['fields_label'];
       </div>
       <div class="card-body">
         <div class="formula-box">
-          d(x, c) = √[ (x₁−c₁)² + (x₂−c₂)² + (x₃−c₃)² + (x₄−c₄)² + (x₅−c₅)² ] &nbsp;·&nbsp; Jarak terkecil → ditugaskan (✓)
+          d(x, c) = √[ (x₁−c₁)² + (x₂−c₂)² + (x₃−c₃)² + (x₄−c₄)² + (x₅−c₅)² ] &nbsp;·&nbsp; Jarak terkecil → ditugaskan (Terpilih)
         </div>
         <div class="table-wrap">
           <table>
@@ -104,7 +104,7 @@ $fieldsLabel = $km['fields_label'];
                   <td style="font-weight:700;color:var(--text);font-size:12px;"><?= htmlspecialchars($w['nama']) ?></td>
                   <?php foreach ($dm['distances'] as $di => $dist): $isMin = ($di === $dm['assigned']); ?>
                     <td class="mono" style="font-size:12px;font-weight:<?= $isMin ? '800' : '400' ?>;color:<?= $isMin ? 'var(--emerald)' : 'var(--text-3)' ?>;background:<?= $isMin ? 'rgba(16,185,129,0.07)' : 'transparent' ?>;">
-                      <?= $dist ?><?= $isMin ? ' ✓' : '' ?>
+                      <?= $dist ?><?= $isMin ? ' (Terpilih)' : '' ?>
                     </td>
                   <?php endforeach; ?>
                   <td>

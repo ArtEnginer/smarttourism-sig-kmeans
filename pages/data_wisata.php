@@ -22,9 +22,9 @@ $totalData = count($allWisata);
           <option value="<?= $j ?>" <?= $jenisFilter === $j ? 'selected' : '' ?>><?= $j ?></option>
         <?php endforeach; ?>
       </select>
-      <a href="clustering.php" class="btn btn-primary btn-sm"><i data-lucide="bot" style="width:14px;height:14px;"></i> Jalankan Clustering</a>
+      <a href="<?= appUrl('pages/clustering.php') ?>" class="btn btn-primary btn-sm"><i data-lucide="bot" style="width:14px;height:14px;"></i> Jalankan Clustering</a>
       <?php if (function_exists('isAdmin') && isAdmin()): ?>
-        <a href="admin/destinasi.php" class="btn btn-secondary btn-sm"><i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Kelola Data</a>
+        <a href="<?= appUrl('admin/destinasi.php') ?>" class="btn btn-secondary btn-sm"><i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Kelola Data</a>
       <?php endif; ?>
     </div>
   </div>
