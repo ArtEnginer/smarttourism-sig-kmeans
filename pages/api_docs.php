@@ -687,8 +687,9 @@ $baseUrl = rtrim(appUrl(''), '/');
       const headers = apiKey ? `, {\n    headers: { 'X-API-Key': '${apiKey}' }\n  }` : '';
       code = `fetch('${url}'${headers})\n  .then(res => res.json())\n  .then(data => console.log(data))\n  .catch(err => console.error(err));`;
     } else if (activeSnippetType === 'php') {
+      const phpTag = '<' + '?php';
       const headerPhp = apiKey ? `\ncurl_setopt($ch, CURLOPT_HTTPHEADER, ['X-API-Key: ${apiKey}']);` : '';
-      code = `<?php\n$ch = curl_init('${url}');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);${headerPhp}\n$response = curl_exec($ch);\n$data = json_decode($response, true);\nprint_r($data);`;
+      code = phpTag + `\n$ch = curl_init('${url}');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);${headerPhp}\n$response = curl_exec($ch);\n$data = json_decode($response, true);\nprint_r($data);`;
     } else if (activeSnippetType === 'python') {
       const headersPy = apiKey ? `, headers={'X-API-Key': '${apiKey}'}` : '';
       code = `import requests\n\nresponse = requests.get('${url}'${headersPy})\ndata = response.json()\nprint(data)`;
