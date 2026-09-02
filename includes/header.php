@@ -43,6 +43,11 @@ $userNavItems = [
     'label' => 'Peta Interaktif',
     'url'   => appUrl('pages/peta.php')
   ],
+  'api_docs' => [
+    'icon'  => 'code-2',
+    'label' => 'Dokumentasi API',
+    'url'   => appUrl('pages/api_docs.php')
+  ],
 ];
 
 /*
@@ -65,6 +70,11 @@ $adminNavItems = [
     'icon'  => 'users',
     'label' => 'Kelola Pengguna',
     'url'   => appUrl('admin/users.php')
+  ],
+  'api_docs' => [
+    'icon'  => 'code-2',
+    'label' => 'Dokumentasi API',
+    'url'   => appUrl('pages/api_docs.php')
   ],
 ];
 
